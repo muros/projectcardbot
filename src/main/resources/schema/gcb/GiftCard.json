@@ -1,0 +1,24 @@
+{
+  "title": "Gift Card Schema",
+  "type": "object",
+  "properties": {
+    "card_number": {
+      "type": "string"
+    },
+    "card_key": {
+      "type": "string"
+    },
+    "pin": {
+      "type": "string"
+    },
+    "barcode": {
+      "type": "string"
+    },
+    "icon": {
+      "type": "string"
+    },
+    "image": {
+      "type": "string"
+    }
+  }
+}

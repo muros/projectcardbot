@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Gift Merchant",
+  "definitions": {
+    "GiftShopCard": {
+      "title": "Gift Shop Card",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "currency_code": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        }
+      }
+    },
+    "GiftCategory": {
+      "title": "Gift Category",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "provider": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "card_name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "country_code": {
+      "type": "string"
+    },
+    "icon_url": {
+      "type": "string"
+    },
+    "card_image_url": {
+      "type": "string"
+    },
+    "cards": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GiftShopCard"
+      }
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/GiftCategory"
+      }
+    }
+  }
+}

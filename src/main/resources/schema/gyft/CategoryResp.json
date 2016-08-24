@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Merchant Response",
+  "definitions": {
+    "MerchantCategory": {
+      "title": "Merchant Category",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "integer"
+    },
+    "details": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/MerchantCategory"
+      }
+    }
+  }
+}

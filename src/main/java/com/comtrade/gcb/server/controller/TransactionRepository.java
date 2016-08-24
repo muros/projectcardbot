@@ -1,0 +1,7 @@
+package com.comtrade.gcb.server.controller;
+
+import com.comtrade.gcb.data.jpa.Transaction;
+import org.springframework.data.repository.CrudRepository;
+
+public interface TransactionRepository extends CrudRepository<Transaction, Long> {
+}

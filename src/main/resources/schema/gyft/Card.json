@@ -1,0 +1,224 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Card",
+  "definitions": {
+    "LabelValue": {
+      "title": "Label Value",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "Barcode": {
+      "title": "Barcode",
+      "type": "object",
+      "properties": {
+        "image_url": {
+          "type": "string"
+        }
+      }
+    },
+    "Credentials" : {
+      "title": "Credentials",
+      "type": "object",
+      "properties": {
+        "pin": { "$ref": "#/definitions/LabelValue" },
+        "barcode": { "$ref": "#/definitions/Barcode" },
+        "card_number": { "$ref": "#/definitions/LabelValue" },
+        "additional_field": {
+          "type": "object"
+        }
+      }
+    },
+    "Micros": {
+      "title": "Micros",
+      "type": "object",
+      "properties": {
+        "micros": {
+          "type": "number"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
+    "LabelUrl": {
+      "title": "Label Url",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        }
+      }
+    },
+    "TermsConditions": {
+      "title": "Terms and Conditions",
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "LabelText": {
+      "title": "Label Text",
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        }
+      }
+    },
+    "CardNumberRedemption": {
+      "title": "Card Number Redemption",
+      "type": "object",
+      "properties": {
+        "supported": {
+          "type": "boolean"
+        },
+        "redemption_instructions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/LabelText" }
+        }
+      }
+    },
+    "RedemptionMethod": {
+      "title": "Redemption Method",
+      "type": "object",
+      "properties": {
+        "card_number_redemption": { "$ref": "#/definitions/CardNumberRedemption" }
+      }
+    },
+    "Prepaid": {
+      "title": "Prepaid",
+      "type": "object",
+      "properties": {
+        "terms_and_conditions": { "$ref": "#/definitions/TermsConditions" },
+        "redemption_methods": { "$ref": "#/definitions/RedemptionMethod" }
+      }
+    },
+    "Asset": {
+      "title": "Asset",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "brand": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "homepage": { "$ref": "#/definitions/LabelUrl" },
+        "prepaid": { "$ref": "#/definitions/Prepaid" }
+      }
+    },
+    "Theme": {
+      "title": "Theme",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "cover_image_url": {
+          "type": "string"
+        },
+        "icon_image_url": {
+          "type": "string"
+        },
+        "include_terms_inline": {
+          "type": "boolean"
+        },
+        "printing_enabled": {
+          "type": "boolean"
+        },
+        "primary_color_hex": {
+          "type": "string"
+        },
+        "third_party_wallet_disabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Message": {
+      "title": "Message",
+      "type": "object",
+      "properties": {
+        "to_email": {
+          "type": "string"
+        },
+        "delivery_method": {
+          "type": "string"
+        }
+      }
+    },
+    "Order": {
+      "title": "Order",
+      "type": "object",
+      "properties": {
+        "order_id": {
+          "type": "number"
+        }
+      }
+    },
+    "CardDetails" : {
+      "title": "Card Details",
+      "type": "object",
+      "properties": {
+        "credentials": { "$ref": "#/definitions/Credentials" },
+        "balance": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Micros" }
+        },
+        "asset": { "$ref": "#/definitions/Asset" },
+        "theme": { "$ref": "#/definitions/Theme" },
+        "message": { "$ref": "#/definitions/Message" },
+        "order_data": { "$ref": "#/definitions/Order" }
+      }
+    },
+    "DisplayOptions": {
+      "title": "Disiplay Options",
+      "type": "object",
+      "properties": {
+        "gyft_help": {
+          "type": "boolean"
+        },
+        "powered_by_gyft": {
+          "type": "boolean"
+        },
+        "gyft_smart_widget": {
+          "type": "boolean"
+        },
+        "archive": {
+          "type": "boolean"
+        },
+        "gyft_badge": {
+          "type": "boolean"
+        },
+        "gyft_marketing": {
+          "type": "boolean"
+        },
+        "gyft_footer": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "cardDetails": { "$ref": "#/definitions/CardDetails" },
+    "displayOptions": { "$ref": "#/definitions/DisplayOptions"}
+  }
+}

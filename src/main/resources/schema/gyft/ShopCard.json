@@ -1,0 +1,33 @@
+{
+    "title": "ShopCard Schema",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "merchant_id": {
+            "type": "string"
+        },
+        "merchant_name": {
+            "type": "string"
+        },
+        "long_description": {
+            "type": "string"
+        },
+        "card_currency_code": {
+            "type": "string"
+        },
+        "opening_balance": {
+            "type": "number"
+        },
+        "merchant_card_template_id": {
+            "type": "integer"
+        },
+        "merchant_icon_image_url_hd": {
+            "type": "string"
+        },
+        "cover_image_url_hd": {
+            "type": "string"
+        }
+    }
+}

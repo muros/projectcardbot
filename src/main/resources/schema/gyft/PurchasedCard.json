@@ -1,0 +1,12 @@
+{
+    "title": "Purchased Card",
+    "type": "object",
+    "properties": {
+        "id": {
+            "type": "integer"
+        },
+        "url": {
+            "type": "string"
+        }
+    }
+}

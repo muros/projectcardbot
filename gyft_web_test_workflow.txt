@@ -1,0 +1,68 @@
+{
+    "id": "y3b723chj4jgrhq55bx74bhu",
+    "global_shop_cards": true,
+    "username": "muros",
+    "name": "muros-gift-app",
+    "application_name": "muros-gift-app",
+    "contact_name": "Uros",
+    "contact_email": "upumesar@gmail.com",
+    "balance": 50000.00,
+    "balance_updated_when": 1469785273000
+}
+
+To kupim:
+{
+    "id": 3825,
+    "merchant_id": "211-1346844972352-24",
+    "merchant_name": "Foot Locker",
+    "long_description": "<p>Foot Locker is one of the top athletic footwear and athletic apparel retailers in the U.S. Shop for men's, women's, and kids' athletic shoes and clothing from top brands including Adidas, Nike, Asics, New Era, Puma, Under Armour, and many more! This is a great gift for sports fans, athletes, kids, teens, and adults. A Foot Locker gift card can be used at any Foot Locker, Lady Foot Locker, or Kids Foot Locker location. They have more than 1200 Foot Locker locations in the U.S.</p>\r\n        <p>A Foot Locker gift card is a perfect gift for athletes and sports fans.</p>",
+    "card_currency_code": "USD",
+    "opening_balance": 10.00,
+    "merchant_card_template_id": 3750,
+    "cover_image_url_hd": "http://imagestest.gyft.com/merchants_cards/c-211-1346844972355-64_cover_hd.png",
+    "merchant_icon_image_url_hd": "http://imagestest.gyft.com/merchants/i-211-1346844972353-0_hd.png"
+}
+
+request:
+https://apitest.gyft.com/mashery/v1/partner/purchase/gift_card_direct?shop_card_id=3825&to_email=upumesar%40gmail.com&reseller_reference=1234-reseler-ref&notes=Notes+description.&first_name=Uros&last_name=Mesaric&gender=male&birthday=21%2F02%2F1972&api_key=y3b723chj4jgrhq55bx74bhu&sig=13e31afd829360fce24bd3124a42b8c05b79372652f3f532503024f3c430cc10
+
+response:
+{
+    "id": 1251241,
+    "url": "https://staging.gyft.com/card/#/?c=$ODgwODI3NGIzYzc4NGEwYjliZWIyOTdjYmVlNTFmYzUyOTNlZTNmNGJkM2Q0ZWExOWIzN2VlNzkxMWNiMGVmOFlr"
+}
+
+kupim isto še enkrat
+{
+    "id": 1251245,
+    "url": "https://staging.gyft.com/card/#/?c=$ZjFiNjk4ZDdjZGNmNGZiZWI3MGQ3MWVkZWQwYWI4YWIzMDcxNDk0NWZkNWM0ZGY4YWU0N2RmZDkyYzU5ODkzN2hs"
+}
+
+prvo, ki sem jo že sprintal refundam
+Response Status: 400 Bad Request
+Body: [ServiceException] Can 't refund a gift card that is already revealed
+
+refundam drugo, ki je še nisem pogledal:
+{
+    "id": "NDAxOWM0NmFiZThkNGRjZjliNjdiMjQ2MTQ2MmU5ZmU1MmE1MTRjOGJkYTg0NzhmOTAyMzZmMmQ3MWQwZTA4N1V4",
+    "status": 0,
+    "gf_reseller_id": "y3b723chj4jgrhq55bx74bhu",
+    "gf_reseller_transaction_id": 1251248,
+    "email": "upumesar@gmail.com",
+    "first_name": "Uros",
+    "last_name": "Mesaric",
+    "gender": 0,
+    "birthday": [1972, 2, 21],
+    "gf_order_id": 3642768,
+    "gf_order_detail_id": 3642720,
+    "gf_gyfted_card_id": 2297785,
+    "invalidated": false
+}
+
+Ko jo refundam, ni veè dostopna preko linka, ki je kreiran pri nakupu.
+Link pri nakupu vrne samo ob nakupu in ga kasneje ne moreš videti.
+Ali ga bomo hranili?
+
+èe refundam 2x
+400
+[ServiceException] Card is already refunded

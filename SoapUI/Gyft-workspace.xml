@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-workspace name="Gift Card Bot" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config">
+  <con:settings/>
+  <con:project name="Gyft">C:/Dev/gyft/SoapUI/Gyft-soapui-project.xml</con:project>
+  <con:collectInfoForSupport>false</con:collectInfoForSupport>
+</con:soapui-workspace>

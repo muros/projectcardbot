@@ -1,0 +1,135 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Merchant Response",
+  "definitions": {
+    "MerchantShopCard": {
+      "title": "Merchant Shop Card",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "currency_code": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "opening_balance": {
+          "type": "number"
+        }
+      }
+    },
+    "MerchantCategory": {
+      "title": "Merchant Category",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Merchant": {
+      "title": "Merchant",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "long_description": {
+          "type": "string"
+        },
+        "country_code": {
+          "type": "string"
+        },
+        "balance_checking_phone_number": {
+          "type": "string"
+        },
+        "homepage_label": {
+          "type": "string"
+        },
+        "homepage_url": {
+          "type": "string"
+        },
+        "facebook_id": {
+          "type": "string"
+        },
+        "twitter_id": {
+          "type": "string"
+        },
+        "google_id": {
+          "type": "string"
+        },
+        "shop_cards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MerchantShopCard"
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MerchantCategory"
+          }
+        },
+        "meta_title": {
+          "type": "string"
+        },
+        "meta_description": {
+          "type": "string"
+        },
+        "min_card_value": {
+          "type": "number"
+        },
+        "max_card_value": {
+          "type": "number"
+        },
+        "cover_image_url_hd": {
+          "type": "string"
+        },
+        "facebook_url": {
+          "type": "string"
+        },
+        "google_plus_url": {
+          "type": "string"
+        },
+        "twitter_url": {
+          "type": "string"
+        },
+        "card_name": {
+          "type": "string"
+        },
+        "icon_url": {
+          "type": "string"
+        },
+        "redemption_options_value": {
+          "type": "string"
+        },
+        "more_info_url": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "integer"
+    },
+    "details": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Merchant"
+      }
+    }
+  }
+}

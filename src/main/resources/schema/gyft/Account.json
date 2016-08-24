@@ -1,0 +1,33 @@
+{
+  "title": "Account Schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "global_shop_cards": {
+      "type": "boolean"
+    },
+    "username": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "application_name": {
+      "type": "string"
+    },
+    "contact_name": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "balance": {
+      "type": "number"
+    },
+    "balance_updated_when": {
+      "type": "number"
+    }
+  }
+}
