@@ -81,7 +81,28 @@ Git clone example code:
 
 $git clone https://github.com/fbsamples/messenger-platform-samples.git  
 
+# Apache on EC2
+
+sudo yum update -y  
+sudo yum install -y httpd24  
+sudo service httpd start  
+sudo chkconfig httpd on  
+chkconfig --list httpd  
+
+AWS navodila:  
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/install-LAMP.html  
+
+# Letsencrypt certs
+
+https://github.com/Daplie/letsencrypt-cli  
+Check SSL on server:  
+https://www.ssllabs.com  
+
+
 # TODO
 * Add payment info to transaction table
 * Transaction update field names
 * Add metadata to payment on Stripe
+
+C:\Dev\gyft\target>scp -i "C:\Users\muros.HSL\Documents\AWS\ec2-key-pair-virgini
+a.pem" gift-card-bot-rest-0.1.0.jar ec2-user@52.203.56.236:dev/gyft

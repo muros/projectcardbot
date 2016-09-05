@@ -1,0 +1,137 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "CommonFormat Schema",
+    "definitions": {
+        "Entry": {
+            "title": "Entry",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "number"
+                },
+                "messaging": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Messaging"
+                    }
+                }
+            }
+        },
+        "Messaging": {
+            "title": "Messaging",
+            "type": "object",
+            "properties": {
+                "sender": {
+                    "$ref": "#/definitions/User"
+                },
+                "recipient": {
+                    "$ref": "#/definitions/User"
+                },
+                "timestamp": {
+                    "type": "number"
+                },
+                "optin": {
+                    "$ref": "#/definitions/Optin"
+                },
+                "message": {
+                    "$ref": "#/definitions/Message"
+                },
+                "postback": {
+                    "$ref": "#/definitions/Postback"
+                },
+                "delivery": {
+                    "$ref": "#/definitions/Delivery"
+                }
+
+            },
+            "required": ["sender", "recipient"]
+        },
+        "User": {
+            "title": "Sender or Recipient",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            }
+        },
+        "Optin": {
+            "title": "Authentication",
+            "type": "object",
+            "properties": {
+                "ref": {
+                    "type": "string"
+                }
+            }
+        },
+        "Message": {
+            "title": "Message",
+            "type": "object",
+            "properties": {
+                "mid": {
+                    "type": "string"
+                },
+                "seq": {
+                    "type": "number"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "quick_reply": {
+                    "$ref": "#/definitions/QuickReplay"
+                }
+            }
+        },
+        "QuickReplay": {
+            "title": "Quick Replay",
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "type": "string"
+                }
+            }
+        },
+        "Postback": {
+            "title": "Postback",
+            "type": "object",
+            "properties": {
+                "payload": {
+                    "type": "string"
+                }
+            }
+        },
+        "Delivery": {
+            "title": "Delivery",
+            "type": "object",
+            "properties": {
+                "mids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "watermark": {
+                    "type": "string"
+                },
+                "seq": {
+                    "type": "number"
+                }
+            }
+        }
+    },
+    "type": "object",
+    "properties": {
+        "object": {
+            "type": "string"
+        },
+        "entry": {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/Entry"
+            }
+        }
+    }
+}

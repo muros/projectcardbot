@@ -1,0 +1,82 @@
+{
+  "cardDetails": {
+    "credentials": {
+      "pin": {
+        "label": "Pin Number",
+        "value": "37187992"
+      },
+      "barcode": {
+        "image_url": "https://apitest.gyft.com/barcodes/linear?bc=TEST016127863982"
+      },
+      "card_number": {
+        "label": "Card Number",
+        "value": "TEST016127863982"
+      },
+      "additional_field": {}
+    },
+    "balance": [
+      {
+        "micros": 10000000,
+        "type": "OPENING"
+      },
+      {
+        "micros": 10000000,
+        "type": "CURRENT"
+      }
+    ],
+    "asset": {
+      "id": "211-1346844972352-24",
+      "brand": "Foot Locker",
+      "currency": "USD",
+      "homepage": {
+        "label": "Go to footlocker.com",
+        "url": "http://www.footlocker.com"
+      },
+      "prepaid": {
+        "terms_and_conditions": {
+          "text": "This Gift Card is active and can be applied towards any purchase at footlocker.com, kidsfootlocker.com or ladyfootlocker.com (Quebec residents excluded from online purchasing), or by phone, or at Foot Locker, Kids Foot Locker or Lady Foot Locker stores in the U.S.A. Your Gift Card may not be exchanged for cash, cannot be used to purchase another Gift Card, and will not be replaced if lost or stolen"
+        },
+        "redemption_methods": {
+          "card_number_redemption": {
+            "supported": true,
+            "redemption_instructions": [
+              {
+                "label": "In-Store",
+                "text": "To redeem this Gift Card in stores, present this printout at the time of purchase. \nTo redeem this Gift Card from a mobile device display the Gift Card Number to the cashier at the time of purchase. \nCoupon/discount codes may be used when redeeming a Gift Card or Gift Certificate."
+              },
+              {
+                "label": "Online",
+                "text": "To redeem this Gift Card online, use the 16-digit number and the PIN provided in this virtual gift card. \nTo redeem this Gift Card by phone, call us toll-free at 1.800.991.6815. \n"
+              }
+            ]
+          }
+        }
+      }
+    },
+    "theme": {
+      "id": "211-1346844972352-24",
+      "cover_image_url": "http://imagestest.gyft.com/merchants_cards/c-211-1346844972355-64_cover_hd.png",
+      "icon_image_url": "http://imagestest.gyft.com/merchants/i-211-1346844972353-0_hd.png",
+      "include_terms_inline": false,
+      "printing_enabled": true,
+      "primary_color_hex": "e51937",
+      "third_party_wallet_disabled": false
+    },
+    "message": {
+      "to_email": "upumesar@gmail.com",
+      "delivery_method": "EXTERNAL"
+    },
+    "order_data": {
+      "order_id": 3642762
+    }
+  },
+  "displayOptions": {
+    "gyft_help": "true",
+    "powered_by_gyft": "false",
+    "gyft_smart_widget": "false",
+    "archive": "false",
+    "gyft_badge": "false",
+    "gyft_marketing": "false",
+    "gyft_footer": "false"
+  }
+}

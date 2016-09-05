@@ -91,6 +91,26 @@
                             <goal>generate</goal>
                         </goals>
                     </execution>
+                    <execution>
+                        <id>msg-webhook-json</id>
+                        <configuration>
+                            <sourceDirectory>${basedir}/src/main/resources/schema/messenger/webhook</sourceDirectory>
+                            <targetPackage>com.comtrade.messenger.webhook</targetPackage>
+                        </configuration>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>msg-send-json</id>
+                        <configuration>
+                            <sourceDirectory>${basedir}/src/main/resources/schema/messenger/send</sourceDirectory>
+                            <targetPackage>com.comtrade.messenger.send</targetPackage>
+                        </configuration>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>

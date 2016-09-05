@@ -1,0 +1,135 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Send API Schema",
+    "definitions": {
+        "Recipient": {
+            "title": "Recipient",
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "phone_number": {
+                    "type": "string"
+                }
+            }
+        },
+        "Message": {
+            "title": "Message",
+            "type": "object",
+            "properties": {
+                "text": {
+                    "type": "string"
+                },
+                "attachment": {
+                    "$ref": "#/definitions/Attachment"
+                },
+                "quick_replies": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/QuickReplay"
+                    }
+                },
+                "metadata": {
+                    "type": "string"
+                }
+            }
+        },
+        "Attachment": {
+            "title": "Attachment",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "payload": {
+                    "$ref": "#/definitions/Payload"
+                }
+            }
+        },
+        "Payload": {
+            "title": "Payload",
+            "type": "object",
+            "properties": {
+                "template_type": {
+                    "type": "string"
+                },
+                "elements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Element"
+                    }
+                }
+            }
+        },
+        "QuickReplay": {
+            "title": "Quick Replay",
+            "type": "object",
+            "properties": {
+                "content_type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                }
+            }
+        },
+        "Element": {
+            "title": "Element",
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                },
+                "item_url": {
+                    "type": "string"
+                },
+                "image_url": {
+                    "type": "string"
+                },
+                "subtitle": {
+                    "type": "string"
+                },
+                "buttons": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Button"
+                    }
+                },
+                "required": ["title"]
+            }
+        },
+        "Button": {
+            "title": "Element",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "payload": {
+                    "type": "string"
+                },
+                "required": ["type", "title"]
+            }
+        }
+    },
+    "type": "object",
+    "properties": {
+        "recipient": {
+            "$ref": "#/definitions/Recipient"
+        },
+        "message": {
+            "$ref": "#/definitions/Message"
+        }
+    },
+    "required": ["recipient"]
+}

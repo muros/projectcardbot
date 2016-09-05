@@ -22,11 +22,11 @@ public class StripePaymentClient {
     public String pay() {
         String stripeToken = "";
 
-
         return stripeToken;
     }
 
-    public String checkout(String stripeToken, int amount, String currency, String description) {
+    public String checkout(String stripeToken, int amount, String currency, String description,
+                           String messageId, String recipientId) {
         String chargeId = "";
         // Set your secret key: remember to change this to your live secret key in production
         // See your keys here: https://dashboard.stripe.com/account/apikeys
@@ -39,6 +39,10 @@ public class StripePaymentClient {
             chargeParams.put("currency", currency);
             chargeParams.put("source", stripeToken);
             chargeParams.put("description", description);
+            Map<String, String> initialMetadata = new HashMap<String, String>();
+            initialMetadata.put("message_id", messageId);
+            initialMetadata.put("recipient_id", recipientId);
+            chargeParams.put("metadata", initialMetadata);
 
             Charge charge = Charge.create(chargeParams);
             chargeId = charge.getId();

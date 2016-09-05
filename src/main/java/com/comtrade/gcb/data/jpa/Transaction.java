@@ -9,22 +9,24 @@ public class Transaction {
     @GeneratedValue
     private Long id;
 
-    private String userId;
+    private String recipientId;
     @Enumerated(EnumType.ORDINAL)
     private TransactionType type;
     private String referenceId;
     private Date timestamp;
     private Integer amount;
-    private String merchantId;
+    private String messageId;
     private String cardId;
     private String cardKey;
+    private String paymentReference;
+    private String locale;
 
-    public String getUserId() {
-        return userId;
+    public String getRecipientId() {
+        return recipientId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setRecipientId(String recipientId) {
+        this.recipientId = recipientId;
     }
 
     public Long getId() {
@@ -67,12 +69,12 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public String getMerchantId() {
-        return merchantId;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public void setMerchantId(String merchantId) {
-        this.merchantId = merchantId;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getCardId() {
@@ -82,6 +84,7 @@ public class Transaction {
     public void setCardId(String cardId) {
         this.cardId = cardId;
     }
+
     public String getCardKey() {
         return cardKey;
     }
@@ -90,4 +93,18 @@ public class Transaction {
         this.cardKey = cardKey;
     }
 
+    public String getLocale() {
+        return locale;
+    }
+
+    public void setLocale(String locale) {
+        this.locale = locale;
+    }
+    public String getPaymentReference() {
+        return paymentReference;
+    }
+
+    public void setPaymentReference(String paymentReference) {
+        this.paymentReference = paymentReference;
+    }
 }

@@ -2,19 +2,27 @@ package com.comtrade.gcb.client.gyft;
 
 import com.comtrade.gcb.Gender;
 import com.comtrade.gcb.GiftCard;
+import com.comtrade.gcb.data.jpa.Transaction;
+import com.comtrade.gcb.data.jpa.TransactionType;
+import com.comtrade.gcb.server.controller.AuthorizationClient;
+import com.comtrade.gcb.server.controller.StripePaymentClient;
+import com.comtrade.gcb.server.controller.TransactionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -25,6 +33,15 @@ import java.util.List;
 public class GyftClient {
 
     private static final Logger log = LoggerFactory.getLogger(GyftClient.class);
+
+    @Autowired
+    AuthorizationClient authClient;
+
+    @Autowired
+    StripePaymentClient stripe;
+
+    @Autowired
+    TransactionRepository transactionRepo;
 
     @Value("${gyft.host}")
     private String host;
@@ -106,6 +123,26 @@ public class GyftClient {
         return response.getBody().getDetails();
     }
 
+    public GiftCardDetail getCardDetails(String cardId) {
+        final String method = "/reseller/merchants";
+        String methodURL = null;
+        String timestamp = GyftUtil.createTimestamp();
+        try {
+            methodURL = GyftUtil.createFullUrl(host, root, method, apiKey, apiSecret, timestamp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("x-sig-timestamp", timestamp);
+        HttpEntity requestEntity = new HttpEntity(null, requestHeaders);
+        ResponseEntity<MerchantResp> response = restTemplate.exchange(methodURL, HttpMethod.GET,
+                requestEntity, MerchantResp.class);
+        GiftCardDetail gyftCardDetail = extractCardDetail(response.getBody().getDetails(), cardId);
+
+        return gyftCardDetail;
+    }
+
     public List<Detail> categories() {
         final String method = "/reseller/categories";
         String methodURL = null;
@@ -123,6 +160,66 @@ public class GyftClient {
                 requestEntity, CategoryResp.class);
 
         return response.getBody().getDetails();
+    }
+
+    public GiftCard purchaseGyftCard(String recipientId,
+                          String messageId,
+                          String locale,
+                          String cardId,
+                          String paymentToken,
+                          String recipientEmail,
+                          String notes,
+                          String firstName,
+                          String lastName) {
+        if (authClient.isUserAuthorized(locale)) {
+            String cardIdOnly = "";
+            String cardIdParts[] = cardId.split("-");
+            if ((cardIdParts != null) && (cardIdParts.length == 2)) {
+                cardIdOnly = cardIdParts[1];
+            }
+            GiftCard giftCard = purchaseCard(cardIdOnly, recipientEmail, "no-ref",
+                    notes, firstName, lastName, null, null);
+            List<ShopCard> cards = new ArrayList<>();
+            cards = shopCards();
+
+            ShopCard theCard = null;
+            for (ShopCard card: cards) {
+                if (card.getId().equals(cardIdOnly)) {
+                    theCard = card;
+                }
+            }
+            String chargeToken = "";
+            if (giftCard != null) {
+                String currency = "usd";
+                Double price = theCard.getOpeningBalance();
+                chargeToken = stripe.checkout(paymentToken, price.intValue() * 100, currency, "$" + price.intValue(),
+                        messageId, recipientId);
+            }
+
+            GiftCardDetail cardDetails = getCardDetails(cardId);
+            giftCard.setName(cardDetails.getMerchantName());
+            giftCard.setCurrency(cardDetails.getCurrencyCode());
+            giftCard.setPrice(new Double(cardDetails.getPriceAsString()));
+
+            Transaction transaction = new Transaction();
+            transaction.setRecipientId(recipientId);
+            transaction.setMessageId(messageId);
+            if (theCard != null) {
+                transaction.setAmount( (int)(theCard.getOpeningBalance() * 100) );
+            }
+            transaction.setCardId(String.valueOf(cardId));
+            transaction.setReferenceId(giftCard.getCardNumber());
+            transaction.setType(TransactionType.PURCHASE);
+            transaction.setCardKey(giftCard.getCardKey());
+            transaction.setPaymentReference(chargeToken);
+            transaction.setLocale(locale);
+            transaction.setTimestamp(Calendar.getInstance().getTime());
+            transactionRepo.save(transaction);
+
+            return giftCard;
+        } else {
+            throw new RestClientException("User not authorized for gift card purchase.");
+        }
     }
 
     public GiftCard purchaseCard(String cardId, String recipientEmail, String reselerRef, String notes, String firstName,
@@ -184,11 +281,10 @@ public class GyftClient {
         String cardUrl = purchasedCard.getUrl();
         String[] tokens = cardUrl.split("\\?c=");
         String cardKey = tokens[1];
-        GiftCard giftCard = getCardDetails(cardKey);
+        GiftCard giftCard = getPurchasedCardDetails(cardKey);
 
         return giftCard;
     }
-
 
     public Account getAccount() {
         final String method = "/reseller/account";
@@ -209,7 +305,7 @@ public class GyftClient {
         return response.getBody();
     }
 
-    public GiftCard getCardDetails(String cardKey) {
+    public GiftCard getPurchasedCardDetails(String cardKey) {
         String cardURL = GyftUtil.createCardUrl(serviceHost, redemptionRoot, cardKey);
         ResponseEntity<Card> response = restTemplate.exchange(cardURL, HttpMethod.GET,
                 null, Card.class);
@@ -223,5 +319,72 @@ public class GyftClient {
         giftCard.setCardKey(cardKey);
 
         return giftCard;
+    }
+
+    private GiftCardDetail extractCardDetail(List<Detail_> details, String cardId) {
+        GiftCardDetail giftCardDetail = new GiftCardDetail();
+
+        if (details != null) {
+            for (Detail_ detail: details) {
+                List<ShopCard> shopCards = detail.getShopCards();
+                ShopCard card = extractCardWithId(shopCards, cardId);
+                if (card != null) {
+                    giftCardDetail.setCardId(cardId);
+                    giftCardDetail.setCurrencyCode(card.getCurrencyCode());
+                    giftCardDetail.setPrice((int)(card.getPrice() * 100));
+                    giftCardDetail.setMerchantName(detail.getName());
+                    giftCardDetail.setMercnantDescription(detail.getDescription());
+                    giftCardDetail.setMerchantIconUrl(detail.getIconUrl());
+                    giftCardDetail.setMerchantCardImageUrl(detail.getCoverImageUrlHd());
+                    break;
+                }
+            }
+        }
+
+        return giftCardDetail;
+    }
+
+    private ShopCard extractCardWithId(List<ShopCard> shopCards, String cardId) {
+        ShopCard shopCard = null;
+        String[] cardParts = cardId.split("-");
+
+        if (shopCards != null) {
+            for (ShopCard card: shopCards) {
+                if (card.getId().equals(cardParts[1])) {
+                    shopCard = card;
+                    break;
+                }
+            }
+        }
+
+        return shopCard;
+    }
+
+    public List<Detail_> getCardsContainingText(String messageText) {
+        final String method = "/reseller/merchants";
+        String methodURL = null;
+        String timestamp = GyftUtil.createTimestamp();
+        try {
+            methodURL = GyftUtil.createFullUrl(host, root, method, apiKey, apiSecret, timestamp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("x-sig-timestamp", timestamp);
+        HttpEntity requestEntity = new HttpEntity(null, requestHeaders);
+        ResponseEntity<MerchantResp> response = restTemplate.exchange(methodURL, HttpMethod.GET,
+                requestEntity, MerchantResp.class);
+
+        List<Detail_> merchants = new ArrayList<>();
+        List<Detail_> details = response.getBody().getDetails();
+        for (Detail_ merchant: details ) {
+            String name = merchant.getName();
+            if(name.toUpperCase().contains(messageText.toUpperCase())) {
+                merchants.add(merchant);
+            }
+        }
+
+        return merchants;
     }
 }

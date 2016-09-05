@@ -163,15 +163,17 @@ public class GcbController {
                     theCard = card;
                 }
             }
+            String chargeToken = "";
             if (giftCard != null) {
                 String currency = "usd";
                 Double price = theCard.getOpeningBalance();
-                String charge = stripe.checkout(paymentToken, price.intValue() * 100, currency, "$" + price.intValue());
+                chargeToken = stripe.checkout(paymentToken, price.intValue() * 100, currency, "$" + price.intValue(),
+                        messageId, recipientId);
             }
 
             Transaction transaction = new Transaction();
-            transaction.setUserId(recipientId);
-            transaction.setMerchantId(messageId);
+            transaction.setRecipientId(recipientId);
+            transaction.setMessageId(messageId);
             if (theCard != null) {
                 transaction.setAmount( (int)(theCard.getOpeningBalance() * 100) );
             }
@@ -179,6 +181,8 @@ public class GcbController {
             transaction.setReferenceId(giftCard.getCardNumber());
             transaction.setType(TransactionType.PURCHASE);
             transaction.setCardKey(giftCard.getCardKey());
+            transaction.setPaymentReference(chargeToken);
+            transaction.setLocale(locale);
             transaction.setTimestamp(Calendar.getInstance().getTime());
             transactionRepo.save(transaction);
 
@@ -199,7 +203,7 @@ public class GcbController {
 
     @RequestMapping(path="/card/{cardKey}", method=RequestMethod.GET)
     public @ResponseBody GiftCard getCard(@PathVariable("cardKey") String cardKey) {
-        GiftCard card = gyftClient.getCardDetails(cardKey);
+        GiftCard card = gyftClient.getPurchasedCardDetails(cardKey);
 
         return card;
     }

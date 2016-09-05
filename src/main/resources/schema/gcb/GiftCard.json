@@ -19,6 +19,15 @@
     },
     "image": {
       "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
     }
   }
 }

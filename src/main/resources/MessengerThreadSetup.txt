@@ -1,0 +1,10 @@
+curl -X POST -H "Content-Type: application/json" -d '{
+  "setting_type":"greeting",
+  "greeting":{
+    "text":"Welcome to Gift Bot!"
+  }
+}' "https://graph.facebook.com/v2.6/me/thread_settings?access_token=EAAZA5hy7mNowBAKxJ2r0mmYlD6AR8kDZCZAPIz8eeKwZCY1r4obuPWVx7dOgHGaAYLDVgOPdgkCfFfCmix2myEd9I59jpGZBZAVgZBelwwz9Ao8bRn9TihirpZAKyHlu773TkXpAHJ5soY4c2I4EZCXYGVcrsZBFJ0ZCZAfrcgzSe7MZALQZDZD"
+
+# Get user details
+#
+curl -X GET "https://graph.facebook.com/v2.6/1187281374651713?fields=first_name,last_name,locale,timezone,gender&access_token=EAAZA5hy7mNowBAKxJ2r0mmYlD6AR8kDZCZAPIz8eeKwZCY1r4obuPWVx7dOgHGaAYLDVgOPdgkCfFfCmix2myEd9I59jpGZBZAVgZBelwwz9Ao8bRn9TihirpZAKyHlu773TkXpAHJ5soY4c2I4EZCXYGVcrsZBFJ0ZCZAfrcgzSe7MZALQZDZD"
