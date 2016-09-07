@@ -104,5 +104,8 @@ https://www.ssllabs.com
 * Transaction update field names
 * Add metadata to payment on Stripe
 
-C:\Dev\gyft\target>scp -i "C:\Users\muros.HSL\Documents\AWS\ec2-key-pair-virgini
-a.pem" gift-card-bot-rest-0.1.0.jar ec2-user@52.203.56.236:dev/gyft
+# Deploy to EC2
+
+mvn clean install  
+cd target  
+scp -i "C:\Users\muros.HSL\Documents\AWS\ec2-key-pair-virginia.pem" gift-card-bot-rest-0.1.0.jar ec2-user@52.203.56.236:dev/gyft  

@@ -9,6 +9,9 @@ import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
 
+/**
+ * Simple REST request logger.
+ */
 public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(LoggingRequestInterceptor.class);
@@ -24,7 +27,7 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
     }
 
     private void log(HttpRequest request, byte[] body, ClientHttpResponse response) throws IOException {
-        //do logging
-        System.out.println(request);
+
+        log.info("Request:\n{}", request);
     }
 }

@@ -5,7 +5,6 @@ import com.comtrade.gcb.client.gyft.*;
 import com.comtrade.gcb.client.gyft.Category;
 import com.comtrade.gcb.data.jpa.Transaction;
 import com.comtrade.gcb.data.jpa.TransactionType;
-import com.comtrade.gcb.data.jpa.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
@@ -28,9 +27,6 @@ import java.util.List;
 public class GcbController {
 
     @Autowired
-    UserRepository userRepo;
-
-    @Autowired
     TransactionRepository transactionRepo;
 
     @Autowired
@@ -41,27 +37,6 @@ public class GcbController {
 
     @Autowired
     StripePaymentClient stripe;
-
-    @RequestMapping(path="/user", method=RequestMethod.GET)
-    public @ResponseBody List<User> getUsers() {
-        List<User> users = new ArrayList<>();
-
-        Iterable<User> allUsersIter = userRepo.findAll();
-        allUsersIter.forEach(users::add);
-
-        return users;
-    }
-
-    @RequestMapping(path="/user/{id}", method=RequestMethod.GET)
-    public @ResponseBody User getUser(@PathVariable("id") String id) {
-        User user = null;
-
-        if (id != null) {
-            user = userRepo.findOne(id);
-        }
-
-        return user;
-    }
 
     @RequestMapping(path="/health", method=RequestMethod.GET)
     public @ResponseBody Boolean healthCheck() {
@@ -153,7 +128,7 @@ public class GcbController {
                 cardIdOnly = cardIdParts[1];
             }
             GiftCard giftCard = gyftClient.purchaseCard(cardIdOnly, recipientEmail, "no-ref",
-                    notes, firstName, lastName, null, null);
+                    notes, firstName, lastName, null);
             List<ShopCard> cards = new ArrayList<>();
             cards = gyftClient.shopCards();
 

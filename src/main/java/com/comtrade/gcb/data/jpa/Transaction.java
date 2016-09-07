@@ -1,16 +1,15 @@
 package com.comtrade.gcb.data.jpa;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+
 import java.util.Date;
 
-@Entity
 public class Transaction {
     @Id
-    @GeneratedValue
-    private Long id;
+    private String id;
 
     private String recipientId;
-    @Enumerated(EnumType.ORDINAL)
+    //@Enumerated(EnumType.ORDINAL)
     private TransactionType type;
     private String referenceId;
     private Date timestamp;
@@ -29,11 +28,11 @@ public class Transaction {
         this.recipientId = recipientId;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -1,9 +1,9 @@
 package com.comtrade.gcb.server.controller;
 
-import com.comtrade.gcb.client.gyft.CardDetails;
 import com.comtrade.gcb.client.gyft.Detail_;
 import com.comtrade.gcb.client.gyft.GyftClient;
-import com.comtrade.messenger.send.Message;
+import com.comtrade.gcb.data.jpa.Transaction;
+import com.comtrade.gcb.data.jpa.TransactionType;
 import com.comtrade.messenger.webhook.Entry;
 import com.comtrade.messenger.webhook.Messaging;
 import com.comtrade.messenger.webhook.QuickReply;
@@ -15,8 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @EnableAutoConfiguration
@@ -28,6 +28,10 @@ public class ChatBotController {
 
     @Autowired
     GyftClient gyftClient;
+
+    // TODO: remove Test only
+    @Autowired
+    TransactionRepository transactionRepo;
 
     @RequestMapping(path="/messenger/webhook", method=RequestMethod.GET)
     public @ResponseBody String webhookGet(@RequestParam("hub.mode") String mode,
@@ -71,8 +75,19 @@ public class ChatBotController {
                      @RequestParam("message") String message) {
         List<Detail_> merchants = gyftClient.getCardsContainingText(message);
         if ((merchants != null) && (merchants.size() > 0)) {
-            chatBot.sendPurchaseCards(recipientId, merchants);
+            //chatBot.sendPurchaseCards(recipientId, merchants);
         }
+        Transaction transaction = new Transaction();
+        transaction.setRecipientId(recipientId);
+        transaction.setMessageId(recipientId);
+        transaction.setCardId(String.valueOf("fdfd"));
+        transaction.setReferenceId("erwerwer");
+        transaction.setType(TransactionType.PURCHASE);
+        transaction.setCardKey("gggggg");
+        transaction.setPaymentReference("toooken");
+        transaction.setLocale("en_US");
+        transaction.setTimestamp(Calendar.getInstance().getTime());
+        transactionRepo.save(transaction);
     }
 
     private void receivedDeliveryConfirmation(Messaging messagingEvent) {
@@ -131,5 +146,4 @@ public class ChatBotController {
         System.out.println("Received authentication for user " + senderId);
         chatBot.sendTextMessage(senderId, "Authentication successful");
     }
-
 }

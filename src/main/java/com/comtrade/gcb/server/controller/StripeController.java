@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /**
- * Created by muros on 22.8.2016.
+ * Stripe payment functionality.
+ * Provide data for payment form and execute payment checkout.
  */
 @Controller
 @EnableAutoConfiguration

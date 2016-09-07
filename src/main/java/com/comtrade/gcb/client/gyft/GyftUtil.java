@@ -1,8 +1,6 @@
 package com.comtrade.gcb.client.gyft;
 
-import java.net.URL;
 import java.security.MessageDigest;
-import java.util.Arrays;
 
 /**
  * Created by muros on 1.8.2016.

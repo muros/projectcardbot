@@ -1,6 +1,5 @@
 package com.comtrade.gcb.client.gyft;
 
-import com.comtrade.gcb.Gender;
 import com.comtrade.gcb.GiftCard;
 import com.comtrade.gcb.data.jpa.Transaction;
 import com.comtrade.gcb.data.jpa.TransactionType;
@@ -14,8 +13,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -178,7 +175,7 @@ public class GyftClient {
                 cardIdOnly = cardIdParts[1];
             }
             GiftCard giftCard = purchaseCard(cardIdOnly, recipientEmail, "no-ref",
-                    notes, firstName, lastName, null, null);
+                    notes, firstName, lastName, null);
             List<ShopCard> cards = new ArrayList<>();
             cards = shopCards();
 
@@ -223,7 +220,7 @@ public class GyftClient {
     }
 
     public GiftCard purchaseCard(String cardId, String recipientEmail, String reselerRef, String notes, String firstName,
-                             String lastName, Gender gender, Date birthDate) {
+                             String lastName, Date birthDate) {
         final String method = "/partner/purchase/gift_card_direct";
         String methodURL = null;
         String timestamp = GyftUtil.createTimestamp();
@@ -240,11 +237,7 @@ public class GyftClient {
             urlWithParams.append("&notes=").append(notes);
             urlWithParams.append("&first_name=").append(firstName);
             urlWithParams.append("&last_name=").append(lastName);
-            if (gender != null) {
-                urlWithParams.append("&gender=").append(gender.toString());
-            } else {
-                urlWithParams.append("&gender=").append("male");
-            }
+            urlWithParams.append("&gender=").append("male");
             if (birthDate != null) {
                 urlWithParams.append("&birthday=").append(
                         (new SimpleDateFormat("dd/MM/yyyy")).format(birthDate).toString());

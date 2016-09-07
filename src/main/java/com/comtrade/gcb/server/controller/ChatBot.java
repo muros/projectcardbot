@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by muros on 29.8.2016.
+ * Gift Chat bot specific functionality that is based on
+ * Messenger bot.
  */
 @Component
 public class ChatBot extends MessengerBot{

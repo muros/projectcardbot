@@ -1,7 +1,12 @@
 package com.comtrade.gcb.server.controller;
 
 import com.comtrade.gcb.data.jpa.Transaction;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface TransactionRepository extends CrudRepository<Transaction, Long> {
+import java.util.List;
+
+public interface TransactionRepository extends MongoRepository<Transaction, String> {
+
+    List<Transaction> findByRecipientId(String recipientId);
+
 }
