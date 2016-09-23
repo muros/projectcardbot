@@ -1,0 +1,4 @@
+name: ShowMyCards
+states:
+    my_cards:
+        component: MyCards

@@ -8,5 +8,6 @@ import java.util.List;
 public interface TransactionRepository extends MongoRepository<Transaction, String> {
 
     List<Transaction> findByRecipientId(String recipientId);
-
+    Transaction findByUuid(String uuid);
+    List<Transaction> findByUserId(String userId);
 }

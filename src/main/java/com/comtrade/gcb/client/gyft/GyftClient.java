@@ -58,6 +58,9 @@ public class GyftClient {
     @Value("${gyft.services.redemption}")
     private String redemptionRoot;
 
+    @Value("${gyft.services.cardurl}")
+    private String cardUrl;
+
     private RestTemplate restTemplate;
 
     public GyftClient() {
@@ -159,7 +162,8 @@ public class GyftClient {
         return response.getBody().getDetails();
     }
 
-    public GiftCard purchaseGyftCard(String recipientId,
+    public GiftCard purchaseGyftCard(String userId,
+                          String uuid,
                           String messageId,
                           String locale,
                           String cardId,
@@ -190,7 +194,7 @@ public class GyftClient {
                 String currency = "usd";
                 Double price = theCard.getOpeningBalance();
                 chargeToken = stripe.checkout(paymentToken, price.intValue() * 100, currency, "$" + price.intValue(),
-                        messageId, recipientId);
+                        messageId, uuid);
             }
 
             GiftCardDetail cardDetails = getCardDetails(cardId);
@@ -199,15 +203,17 @@ public class GyftClient {
             giftCard.setPrice(new Double(cardDetails.getPriceAsString()));
 
             Transaction transaction = new Transaction();
-            transaction.setRecipientId(recipientId);
+            transaction.setUserId(userId);
+            transaction.setUuid(uuid);
             transaction.setMessageId(messageId);
             if (theCard != null) {
                 transaction.setAmount( (int)(theCard.getOpeningBalance() * 100) );
             }
             transaction.setCardId(String.valueOf(cardId));
             transaction.setReferenceId(giftCard.getCardNumber());
+            transaction.setCardPin(giftCard.getPin());
             transaction.setType(TransactionType.PURCHASE);
-            transaction.setCardKey(giftCard.getCardKey());
+            transaction.setCardKey(cardUrl+giftCard.getCardKey());
             transaction.setPaymentReference(chargeToken);
             transaction.setLocale(locale);
             transaction.setTimestamp(Calendar.getInstance().getTime());
@@ -379,5 +385,40 @@ public class GyftClient {
         }
 
         return merchants;
+    }
+
+    public void getCardValuesForMerchant(String merchantId) {
+        final String method = "/reseller/merchants";
+        String methodURL = null;
+        String timestamp = GyftUtil.createTimestamp();
+        String[] merchantParts = null;
+        if (merchantId != null) {
+            merchantParts = merchantId.split("-");
+        }
+        if ((merchantParts == null) || (merchantParts.length != 3)) {
+            return;
+        }
+        try {
+            methodURL = GyftUtil.createFullUrl(host, root, method, apiKey, apiSecret, timestamp);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("x-sig-timestamp", timestamp);
+        HttpEntity requestEntity = new HttpEntity(null, requestHeaders);
+        ResponseEntity<MerchantResp> response = restTemplate.exchange(methodURL, HttpMethod.GET,
+                requestEntity, MerchantResp.class);
+
+
+        List<ShopCard> cards;
+        List<Detail_> details = response.getBody().getDetails();
+        for (Detail_ merchant: details ) {
+            String id = merchant.getId();
+            if(id.equals(merchantParts[2])) {
+                cards = merchant.getShopCards();
+                break; // only one merchant matches by Id
+            }
+        }
     }
 }

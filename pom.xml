@@ -120,6 +120,21 @@
                 </executions>
             </plugin>
         </plugins>
+        <extensions>
+            <!-- Enabling the use of SSH -->
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh-external</artifactId>
+                <version>1.0-beta-6</version>
+            </extension>
+        </extensions>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <id>ssh-repository</id>
+            <url>scpexe://ec2-user@52.203.56.236/home/ec2-user/dev/gyft</url>
+        </repository>
+    </distributionManagement>
 
 </project>

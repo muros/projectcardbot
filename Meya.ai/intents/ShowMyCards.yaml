@@ -1,0 +1,1 @@
+pattern: ^.*(\bshow\b).*(\bcards\b).*$

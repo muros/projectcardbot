@@ -2,10 +2,15 @@ package com.comtrade.gcb.server.controller;
 
 import com.comtrade.gcb.GiftCard;
 import com.comtrade.gcb.client.gyft.Detail_;
+import com.comtrade.gcb.client.gyft.GyftUtil;
 import com.comtrade.gcb.client.gyft.ShopCard;
+import com.comtrade.gcb.data.jpa.MessageType;
 import com.comtrade.messenger.send.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +21,10 @@ import java.util.List;
 @Component
 public class ChatBot extends MessengerBot{
 
-    private static final int MAX_CARDS = 3;
     private static final int MAX_MERCHANTS = 10;
+
+    @Value("${gyft.services.cardurl}")
+    private String cardUrl;
 
     public String sendPurchaseCard(String recipientId, String providerId) {
 
@@ -44,7 +51,7 @@ public class ChatBot extends MessengerBot{
         elements.add(element);
         payload.setElements(elements);
 
-        String mid = sendGenericTemplate(recipientId, payload);
+        String mid = sendGenericTemplate(MessageType.SHOW_CARDS, recipientId, payload);
 
         return mid;
     }
@@ -63,17 +70,16 @@ public class ChatBot extends MessengerBot{
             List<ShopCard> cards = merchant.getShopCards();
             if ((cards != null) && (cards.size() > 0)) {
                 List<Button> buttons = new ArrayList<>();
-                int cardCnt = 0;
-                for (ShopCard card: cards) {
-                    Button button = new Button();
-                    button.setType("postback");
-                    button.setTitle(card.getCurrencyCode() + " " + card.getPrice());
-                    button.setPayload("gyft-" + card.getId());
-                    buttons.add(button);
-                    if (++cardCnt >= MAX_CARDS) {
-                        break;
-                    }
-                }
+                Button button = new Button();
+                button.setType("element_share");
+                //button.setTitle("Show me amounts");
+                //button.setPayload("merchant-" + merchant.getName() + "-" + merchant.getId());
+                buttons.add(button);
+                button = new Button();
+                button.setType("web_url");
+                button.setTitle("Chose this one");
+                button.setUrl("http://www.ijs.si");
+                buttons.add(button);
                 element.setButtons(buttons);
             }
             elements.add(element);
@@ -83,9 +89,21 @@ public class ChatBot extends MessengerBot{
         }
         payload.setElements(elements);
 
-        String mid = sendGenericTemplate(recipientId, payload);
+        if (merchants.size() > MAX_MERCHANTS) {
+            sendTextMessage(MessageType.SHOW_CARDS, recipientId,
+                    "There is more merchants than I can show. I will show you ten. Refine your search to see all.");
+        }
+        String mid = sendGenericTemplate(MessageType.SHOW_CARDS, recipientId, payload);
 
         return mid;
+    }
+
+    public String sendCardValues(String recipientId, String merchant) {
+        StringBuilder valuesBuilder = new StringBuilder("Possible card values are ");
+
+        sendTextMessage(MessageType.SHOW_VALUES, recipientId, null);
+
+        return null;
     }
 
     public String sendPurchaseReply(String recipientId, String text, String payload, String... options) {
@@ -102,7 +120,7 @@ public class ChatBot extends MessengerBot{
         }
         message.setQuickReplies(replies);
 
-        String mid = sendQuickReply(recipientId, message);
+        String mid = sendQuickReply(MessageType.SHOW_CHECKOUT, recipientId, message);
 
         return mid;
     }
@@ -127,7 +145,7 @@ public class ChatBot extends MessengerBot{
         elements.add(element);
         payload.setElements(elements);
 
-        String mid = sendGenericTemplate(recipientId, payload);
+        String mid = sendGenericTemplate(MessageType.SHOW_CARD_PAYMENT, recipientId, payload);
 
         return mid;
     }
@@ -145,8 +163,47 @@ public class ChatBot extends MessengerBot{
         elements.add(element);
         payload.setElements(elements);
 
-        String mid = sendGenericTemplate(recipientId, payload);
+        String mid = sendGenericTemplate(MessageType.SHOW_BOUGHT_CARD, recipientId, payload);
 
         return mid;
+    }
+
+    public String createPayedCard(GiftCard giftCard) {
+
+        Payload payload = new Payload();
+        payload.setTemplateType("generic");
+        List<Element> elements = new ArrayList<>();
+        Element element = new Element();
+        element.setTitle(giftCard.getName() + " " +  giftCard.getCurrency() + " " + giftCard.getPrice());
+        element.setSubtitle(giftCard.getCardNumber() + " PIN " + giftCard.getPin());
+        element.setImageUrl(giftCard.getImage());
+        List<Button> buttons = new ArrayList<>();
+        Button button = null;
+        button = new Button();
+        button.setType("web_url");
+        button.setTitle("Go to card");
+        String cardURL = cardUrl + giftCard.getCardKey();
+        button.setUrl(cardURL);
+        buttons.add(button);
+        element.setButtons(buttons);
+        elements.add(element);
+        payload.setElements(elements);
+
+        Message message = new Message();
+        Attachment attachment = new Attachment();
+        attachment.setType("template");
+        attachment.setPayload(payload);
+        message.setAttachment(attachment);
+        message.setQuickReplies(null);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String requestAsStr = "NA";
+        try {
+            requestAsStr = mapper.writeValueAsString(message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return requestAsStr;
     }
 }

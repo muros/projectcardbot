@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Selected card - Provide payment</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" request="text/html; charset=UTF-8" />
 </head>
 <body>
 <div class="section">
@@ -26,8 +26,9 @@
                 data-locale="auto"
                 th:attr="data-amount=${cardAmount},data-name=${cardDescription},data-description=${cardValue},data-description=${merchantLogo}">
         </script>
-        <input type="hidden" name="recipientId" value="" th:attr="value=${recipientId}" />
+        <input type="hidden" name="uuid" value="" th:attr="value=${uuid}" />
         <input type="hidden" name="cardId" value="" th:attr="value=${cardId}" />
+        <input type="hidden" name="userId" value="" th:attr="value=${userId}" />
     </form>
 </div>
 </body>

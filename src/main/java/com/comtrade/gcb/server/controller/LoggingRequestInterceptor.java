@@ -28,6 +28,6 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 
     private void log(HttpRequest request, byte[] body, ClientHttpResponse response) throws IOException {
 
-        log.info("Request:\n{}", request);
+        log.info("Response from Messenger:\n", response);
     }
 }

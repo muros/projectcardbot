@@ -2,12 +2,16 @@ package com.comtrade.gcb.server.controller;
 
 import com.comtrade.gcb.client.gyft.Detail_;
 import com.comtrade.gcb.client.gyft.GyftClient;
+import com.comtrade.gcb.data.jpa.Message;
+import com.comtrade.gcb.data.jpa.MessageType;
 import com.comtrade.gcb.data.jpa.Transaction;
 import com.comtrade.gcb.data.jpa.TransactionType;
 import com.comtrade.messenger.webhook.Entry;
 import com.comtrade.messenger.webhook.Messaging;
 import com.comtrade.messenger.webhook.QuickReply;
 import com.comtrade.messenger.webhook.Webhook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
@@ -23,21 +27,25 @@ import java.util.List;
 @ComponentScan("com.comtrade.*")
 public class ChatBotController {
 
+    private static final Logger log = LoggerFactory.getLogger(ChatBotController.class);
+
+    private static final long MAX_DELAY_SEC = 10;
+
     @Autowired
     private ChatBot chatBot;
 
     @Autowired
     GyftClient gyftClient;
 
-    // TODO: remove Test only
     @Autowired
-    TransactionRepository transactionRepo;
+    private MessengerLogger msgLogger;
 
     @RequestMapping(path="/messenger/webhook", method=RequestMethod.GET)
     public @ResponseBody String webhookGet(@RequestParam("hub.mode") String mode,
                                            @RequestParam("hub.verify_token") String verifyToken,
                                            @RequestParam("hub.challenge") String challenge) {
         // Verify token and return challenge
+        log.info("Webhook GET with {}, {}, {}", mode, verifyToken, challenge);
 
         return challenge;
     }
@@ -47,6 +55,7 @@ public class ChatBotController {
     public void webhookPost(@RequestBody Webhook data) {
 
         if ("page".equals(data.getObject())) {
+            log.info("Message that is 'page'");
             List<Entry> entries = data.getEntry();
             for (Entry pageEntry: entries) {
                 String pageId = pageEntry.getId();
@@ -66,28 +75,24 @@ public class ChatBotController {
                     }
                 }
             }
+        } else {
+            log.info("Message that is not 'page'");
+            log.info("Webhook data:\n" + data.getObject());
         }
     }
 
+    // TODO remove Local tests only
     @RequestMapping(path="/messenger/test", method= RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     public void test(@RequestParam("recipientId") String recipientId,
                      @RequestParam("message") String message) {
+
+        log.info("Messenger test method called.");
+
         List<Detail_> merchants = gyftClient.getCardsContainingText(message);
         if ((merchants != null) && (merchants.size() > 0)) {
-            //chatBot.sendPurchaseCards(recipientId, merchants);
+            chatBot.sendPurchaseCards(recipientId, merchants);
         }
-        Transaction transaction = new Transaction();
-        transaction.setRecipientId(recipientId);
-        transaction.setMessageId(recipientId);
-        transaction.setCardId(String.valueOf("fdfd"));
-        transaction.setReferenceId("erwerwer");
-        transaction.setType(TransactionType.PURCHASE);
-        transaction.setCardKey("gggggg");
-        transaction.setPaymentReference("toooken");
-        transaction.setLocale("en_US");
-        transaction.setTimestamp(Calendar.getInstance().getTime());
-        transactionRepo.save(transaction);
     }
 
     private void receivedDeliveryConfirmation(Messaging messagingEvent) {
@@ -120,22 +125,36 @@ public class ChatBotController {
         String payload = "";
 
         String messageText = message.getText();
-        if ((messageText != null) && (messageText.toUpperCase().startsWith("BUY "))) {
-            messageText = messageText.substring(3).trim();
-            // TODO Ok, pojdi skozi listo in dodajaj v carussel kartice, ki imajo v imenu
-            // string ki je v message Text, pazi na omejitev carussela - 20 ali nekaj.
-            List<Detail_> merchants = gyftClient.getCardsContainingText(messageText);
-            if ((merchants != null) && (merchants.size() > 0)) {
-                chatBot.sendPurchaseCards(senderId, merchants);
+        Message lastMsg = msgLogger.findLastLogMessageForRecipient(recipientId, MAX_DELAY_SEC);
+        if ((lastMsg == null)
+                || ((lastMsg != null) && (MessageType.INITIAL.equals(lastMsg.getMessageType())))
+                || ((lastMsg != null) && (MessageType.SHOW_CARDS.equals(lastMsg.getMessageType())))
+                ) {
+            if ((messageText != null) && (messageText.toUpperCase().startsWith("BUY "))) {
+                messageText = messageText.substring(3).trim();
+                List<Detail_> merchants = gyftClient.getCardsContainingText(messageText);
+                if ((merchants != null) && (merchants.size() > 0)) {
+                    chatBot.sendPurchaseCards(senderId, merchants);
+                } else {
+                    chatBot.sendTextMessage(MessageType.INITIAL, senderId, "Can not match a gift card with " + messageText + ".");
+                }
             } else {
-                chatBot.sendTextMessage(senderId, "Can not match a gift card with " + messageText + ".");
+                chatBot.sendTextMessage(MessageType.INITIAL, senderId, "Say buy and card name.");
             }
         } else if (qreply != null) {
             payload = qreply.getPayload();
-            chatBot.sendStripePay(senderId, payload);
+            if (payload.startsWith("merchant")) {
+                //cardsWithValues = gyftClient.getCardValuesForMerchant(payload);
+                chatBot.sendCardValues(senderId, payload);
+            } else if (payload.startsWith("card")) {
+                chatBot.sendStripePay(senderId, payload);
+            }
         } else {
-            chatBot.sendTextMessage(senderId, "Say buy and card name.");
-        }
+        chatBot.sendTextMessage(MessageType.INITIAL, senderId, "Say buy and card name.");
+    }
+
+
+    // TODO refactor this
     }
 
     private void receivedAuthenitcation(Messaging event) {
@@ -144,6 +163,6 @@ public class ChatBotController {
         Double timeOfAuth = event.getTimestamp();
 
         System.out.println("Received authentication for user " + senderId);
-        chatBot.sendTextMessage(senderId, "Authentication successful");
+        chatBot.sendTextMessage(MessageType.INITIAL, senderId, "Authentication successful");
     }
 }

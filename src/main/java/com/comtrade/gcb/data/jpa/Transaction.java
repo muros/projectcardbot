@@ -8,17 +8,35 @@ public class Transaction {
     @Id
     private String id;
 
-    private String recipientId;
-    //@Enumerated(EnumType.ORDINAL)
+    private String uuid;
+    private String userId;
     private TransactionType type;
     private String referenceId;
     private Date timestamp;
     private Integer amount;
+    private String recipientId;
     private String messageId;
     private String cardId;
     private String cardKey;
+    private String cardPin;
     private String paymentReference;
     private String locale;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUuid(){
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getRecipientId() {
         return recipientId;
@@ -90,6 +108,14 @@ public class Transaction {
 
     public void setCardKey(String cardKey) {
         this.cardKey = cardKey;
+    }
+
+    public String getCardPin() {
+        return cardPin;
+    }
+
+    public void setCardPin(String cardPin) {
+        this.cardPin = cardPin;
     }
 
     public String getLocale() {

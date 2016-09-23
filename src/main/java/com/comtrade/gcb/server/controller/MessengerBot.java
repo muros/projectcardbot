@@ -1,20 +1,18 @@
 package com.comtrade.gcb.server.controller;
 
+import com.comtrade.gcb.data.jpa.MessageType;
 import com.comtrade.messenger.send.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by muros on 29.8.2016.
@@ -37,6 +35,9 @@ public class MessengerBot {
     @Value("${messenger.bot.graphApi}")
     private String graphApi;
 
+    @Autowired
+    private MessengerLogger msgLogger;
+
     private RestTemplate restTemplate;
 
     public MessengerBot() {
@@ -49,24 +50,24 @@ public class MessengerBot {
         restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()));
     }
 
-    public String sendTextMessage(String recipientId, String text) {
+    public String sendTextMessage(MessageType messageType, String recipientId, String text) {
         Message message = new Message();
         message.setText(text);
         message.setQuickReplies(null);
 
-        String mid = callSendApi(recipientId, message);
+        String mid = callSendApi(messageType, recipientId, message);
 
         return mid;
     }
 
-    public String sendQuickReply(String recipientId, Message message) {
+    public String sendQuickReply(MessageType messageType, String recipientId, Message message) {
 
-        String mid = callSendApi(recipientId, message);
+        String mid = callSendApi(messageType, recipientId, message);
 
         return mid;
     }
 
-    public String sendGenericTemplate(String recipientId, Payload payload) {
+    public String sendGenericTemplate(MessageType messageType, String recipientId, Payload payload) {
         Message message = new Message();
         Attachment attachment = new Attachment();
         attachment.setType("template");
@@ -74,12 +75,12 @@ public class MessengerBot {
         message.setAttachment(attachment);
         message.setQuickReplies(null);
 
-        String mid = callSendApi(recipientId, message);
+        String mid = callSendApi(messageType, recipientId, message);
 
         return mid;
     }
 
-    private String callSendApi(String recipientId, Message message) {
+    private String callSendApi(MessageType messageType, String recipientId, Message message) {
         String mid = "NA";
         String methodURL = graphApi+"?access_token="+pageAccessToken;
 
@@ -102,6 +103,8 @@ public class MessengerBot {
         } else {
             System.out.println("Response form Send API Fault");
         }
+
+        msgLogger.logMessengerSendMessage(messageType, recipientId, request, response);
 
         return mid;
     }

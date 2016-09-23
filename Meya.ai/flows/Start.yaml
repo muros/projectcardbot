@@ -1,0 +1,23 @@
+name: Start
+states:
+    text_buttons_state:
+        component: meya.text_buttons
+        properties:
+            mode: quick_reply
+            text: Hi, welcome to Coup. You can start by selecting a category
+            output: team
+            buttons:
+            -   text: Featured
+                action: GenericCards
+            -   text: Restaurants
+                action: GenericCards
+            -   text: Retail Stores
+                action: GenericCards
+            -   text: Entertainment
+                action: GenericCards
+            -   text: Home Goods
+                action: GenericCards
+            -   text: Students
+                action: GenericCards
+    generic_cards:
+        flow: GenericCardFlow

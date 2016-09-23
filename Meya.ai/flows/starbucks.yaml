@@ -1,0 +1,67 @@
+name: starbucks
+states:
+    starbucks_cars:
+        component: meya.card
+        properties:
+            image_url: http://imagestest.gyft.com/merchants_cards/c-508-1346844985758-20_cover_hd.png
+            title: Starbucks gift card
+            text: starbucks.com
+            output: card_value
+            buttons:
+            -   text: $50
+                action: next
+                data:
+                    value: 50
+                    cardId: gyft-4698
+            -   text: $100
+                action: next
+                data:
+                    value: 100
+                    cardId: gyft-4614
+    next_state:
+        component: meya.text
+        properties:
+            text: You selected ${{ flow.value }} card
+    uuid_state:
+        component: GenerateUUID
+    check_out:
+        component: meya.text_buttons
+        properties:
+            text: Procede to checkout?
+            mode: buttons
+            buttons:
+            -   text: Yes please
+                action: stripe_pay
+            -   text: No thank you
+                action: finish
+    check_response:
+        component: CheckResponse
+        transitions:
+            yesplease: stripe_pay
+            notnx: finish
+    stripe_pay:
+        component: StripePay
+    wait_for_payment:
+        component: meya.text_buttons
+        properties:
+            text: Once you finsh the payment in browser pop-up, you can redeem the
+                card.
+            mode: buttons
+            buttons:
+            -   text: Redeem card
+                action: redeem_card
+    redeem_card:
+        component: RedeemCard
+        transitions:
+            no_card: wait_for_payment
+            yes_card: finish
+    finish:
+        component: meya.text
+        properties:
+            text: Bye.
+        return: true
+    no_card:
+        component: meya.text
+        properties:
+            text: Sorry.
+        return: true

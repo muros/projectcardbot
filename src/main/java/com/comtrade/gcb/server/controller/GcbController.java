@@ -6,6 +6,7 @@ import com.comtrade.gcb.client.gyft.Category;
 import com.comtrade.gcb.data.jpa.Transaction;
 import com.comtrade.gcb.data.jpa.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.orm.jpa.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
@@ -37,6 +38,12 @@ public class GcbController {
 
     @Autowired
     StripePaymentClient stripe;
+
+    @Autowired
+    ChatBot chatBot;
+
+    @Value("${universal.secret}")
+    private String universalSecret;
 
     @RequestMapping(path="/health", method=RequestMethod.GET)
     public @ResponseBody Boolean healthCheck() {
@@ -111,8 +118,21 @@ public class GcbController {
         return merchants;
     }
 
+    @RequestMapping(path="/carddetail", method=RequestMethod.GET)
+    public @ResponseBody GiftCardDetail cardDetails(@RequestParam ("secret") String secret,
+                                                    @RequestParam("cardId") String cardId) {
+
+        if ((secret == null) || (!secret.equals(universalSecret))) {
+            throw new ForbiddenException();
+        }
+
+        GiftCardDetail cardDetail = gyftClient.getCardDetails(cardId);
+
+        return cardDetail;
+    }
+
     @RequestMapping(path="/purchase", method=RequestMethod.POST)
-    public @ResponseBody GiftCard purchaseCard(@RequestParam("recipientId") String recipientId,
+    public @ResponseBody GiftCard purchaseCard(@RequestParam("uuid") String uuid,
                                                @RequestParam("messageId") String messageId,
                                                @RequestParam("locale") String locale,
                                                @RequestParam("cardId") String cardId,
@@ -143,11 +163,11 @@ public class GcbController {
                 String currency = "usd";
                 Double price = theCard.getOpeningBalance();
                 chargeToken = stripe.checkout(paymentToken, price.intValue() * 100, currency, "$" + price.intValue(),
-                        messageId, recipientId);
+                        messageId, uuid);
             }
 
             Transaction transaction = new Transaction();
-            transaction.setRecipientId(recipientId);
+            transaction.setUuid(uuid);
             transaction.setMessageId(messageId);
             if (theCard != null) {
                 transaction.setAmount( (int)(theCard.getOpeningBalance() * 100) );
@@ -167,6 +187,56 @@ public class GcbController {
         }
     }
 
+    @RequestMapping(path="/redeem", method=RequestMethod.GET)
+    public @ResponseBody GiftCard redeemCard(@RequestParam ("secret") String secret,
+                                             @RequestParam("uuid") String uuid) {
+
+        if ((secret == null) || (!secret.equals(universalSecret))) {
+            throw new ForbiddenException();
+        }
+
+        GiftCard card = new GiftCard();
+        Transaction transaction = transactionRepo.findByUuid(uuid);
+        if (transaction == null) {
+            return card;
+        }
+        GiftCardDetail cardDetails = gyftClient.getCardDetails(transaction.getCardId());
+        card.setName(cardDetails.getMerchantName());
+        card.setCardNumber(transaction.getReferenceId());
+        card.setPin(transaction.getCardPin());
+        card.setCardKey(transaction.getCardKey());
+        card.setImage(cardDetails.getMerchantCardImageUrl());
+
+        return card;
+    }
+
+    @RequestMapping(path="/usercards", method=RequestMethod.GET)
+    public @ResponseBody List<GiftCard> listUserCards(@RequestParam("secret") String secret,
+                                                      @RequestParam("userId") String userId) {
+
+        if ((secret == null) || (!secret.equals(universalSecret))) {
+            throw new ForbiddenException();
+        }
+
+        List<GiftCard> userCards = new ArrayList<>();
+
+        List<Transaction> transactions = transactionRepo.findByUserId(userId);
+        if ((transactions != null) && (transactions.size() > 0)) {
+            for (Transaction transaction: transactions) {
+                GiftCard card = new GiftCard();
+                GiftCardDetail cardDetails = gyftClient.getCardDetails(transaction.getCardId());
+                card.setName(cardDetails.getMerchantName());
+                card.setCardNumber(transaction.getReferenceId());
+                card.setPin(transaction.getCardPin());
+                card.setCardKey(transaction.getCardKey());
+                card.setImage(cardDetails.getMerchantCardImageUrl());
+                userCards.add(card);
+            }
+        }
+
+        return userCards;
+    }
+
     @RequestMapping(path="/account", method=RequestMethod.GET)
     public @ResponseBody
     Account account() {
@@ -181,6 +251,33 @@ public class GcbController {
         GiftCard card = gyftClient.getPurchasedCardDetails(cardKey);
 
         return card;
+    }
+
+    /**
+     * Buy card at Gyft and creater messenger response JSON as expected by Chatfuel.
+     * To test Chatfuel functionality rof JSON API.
+     *
+     * @param cardId
+     * @return
+     */
+    @RequestMapping(path="/freecard", method=RequestMethod.GET)
+    public @ResponseBody String getFreeCard(@RequestParam("cardId") String cardId) {
+
+        // TODO Provide FB messenger message id of payment message. Is that useful and necessary?
+        String messageId = "NA";
+        // TODO Get locale form user in messenger
+        String locale = "en_US";
+        // TODO are these necessary if yes collect them in messenger
+        String recipientEmail = "some@one.com";
+        String notes = "NA";
+        String firstName = "John";
+        String lastName = "Doe";
+        GiftCard giftCard = gyftClient.purchaseGyftCard("freecarder","NA", messageId, locale, cardId, "NA",
+                recipientEmail, notes, firstName, lastName);
+
+        String messengerResponse = chatBot.createPayedCard(giftCard);
+
+        return "[" + messengerResponse + "]";
     }
 
     @ExceptionHandler({RestClientException.class, NullPointerException.class})
