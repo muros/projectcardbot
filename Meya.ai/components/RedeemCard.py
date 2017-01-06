@@ -9,7 +9,7 @@ class RedeemCard(Component):
         uid = self.db.flow.get('uuid')
         # Call middleware to retrieve card data
         try:
-            response = requests.get("http://ec2.urkei.com:9091/v1/giftbot/redeem?uuid="+uid)
+            response = requests.get("http://ec2.urkei.com:9091/v1/giftbot/redeem?secret=cosmicsecret&uuid="+uid)
             print response
             cardName = response.json()['name']
             cardKey = response.json()['card_key']
