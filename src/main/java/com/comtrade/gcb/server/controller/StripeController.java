@@ -6,13 +6,11 @@ import com.comtrade.gcb.client.gyft.GyftClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 /**
  * Stripe payment functionality.
@@ -33,6 +31,9 @@ public class StripeController {
 
     @Value("${universal.secret}")
     private String universalSecret;
+
+    @Value("${stripe.dataKey}")
+    private String dataKey;
 
     @RequestMapping(path="/stripe/pay", method= RequestMethod.POST)
     public String stripePay(@RequestParam("stripeToken") String stripeToken,
@@ -85,6 +86,7 @@ public class StripeController {
         model.addAttribute("uuid", uuid);
         model.addAttribute("cardId", cardId);
         model.addAttribute("userId", userId);
+        model.addAttribute("dataKey", dataKey);
 
         return "stripecard";
     }

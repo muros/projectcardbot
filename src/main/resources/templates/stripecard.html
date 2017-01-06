@@ -18,13 +18,13 @@
     <form action="pay" method="POST">
         <script
                 src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                data-key="pk_test_Ml1wYCpUSpUBsJ3foaTfjN2T"
+                data-key=""
                 data-amount=""
                 data-name=""
                 data-description=""
                 data-image=""
                 data-locale="auto"
-                th:attr="data-amount=${cardAmount},data-name=${cardDescription},data-description=${cardValue},data-description=${merchantLogo}">
+                th:attr="data-key=${dataKey},data-amount=${cardAmount},data-name=${cardDescription},data-description=${cardValue},data-description=${merchantLogo}">
         </script>
         <input type="hidden" name="uuid" value="" th:attr="value=${uuid}" />
         <input type="hidden" name="cardId" value="" th:attr="value=${cardId}" />
